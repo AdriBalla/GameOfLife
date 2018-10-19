@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+
+<script>
+
+    //Cells value
+    const TEMPLATE_ALIVE='1';
+    const TEMPLATE_DEAD='0';
+
+    //Style className of Cells
+    const CLASSNAME_ALIVE = "cell-alive";
+    const CLASSNAME_DEAD = "cell-dead";
+
+    var templates = {TEMPLATE_ALIVE:CLASSNAME_ALIVE,TEMPLATE_DEAD:CLASSNAME_DEAD};
+
+    //interval
+    var interval;
+
+    //Current Grid
+    var grid = [];
+
+    //Size of the grid
+    var gridSize;
+
+    //Index of the current generation
+    var indexGeneration = 0;
+
+    /**
+     * Generate next state for the whole current grid
+     */
+    function generateNextGrid(){
+
+        var nextGrid = [];
+
+        for(var x= 0; x < grid.length; x++) {
+            for(var y= 0; y < grid[x].length; y++) {
+                if (nextGrid[x] == null){
+                    nextGrid[x] = [];
+                }
+                nextGrid[x][y] = nextStateForCell(x,y);
+            }
+        }
+
+        indexGeneration++;
+
+        document.getElementById('title_grid').className = "subtitle_red";
+        document.getElementById('title_grid').innerHTML = indexGeneration;
+
+        grid = nextGrid;
+    }
+
+
+    /**
+     * Calculate next state for a cell
+     * @param int x
+     * @param int y
+     * @return string
+     */
+    function nextStateForCell(x,y){
+
+        maxSize = size-1;
+
+        neightbours = [];
+
+        //Left side of the cell
+        if (y != 0){
+            neightbours.push(grid[x][y-1]);
+
+            if (x != 0){
+                neightbours.push(grid[x-1][y-1]);
+            }
+
+            if (x != maxSize){
+                neightbours.push(grid[x+1][y-1]);
+            }
+        }
+
+        //Middle
+        if (x != 0){
+            neightbours.push(grid[x-1][y]);
+        }
+
+        if (x < maxSize){
+            neightbours.push(grid[x+1][y]);
+        }
+
+        //Right side of the cell
+        if (y < maxSize){
+            neightbours.push(grid[x][y+1]);
+
+            if (x != 0){
+                neightbours.push(grid[x-1][y+1]);
+            }
+
+            if (x != maxSize){
+                neightbours.push(grid[x+1][y+1]);
+            }
+        }
+
+        //Test how many alive
+        var aliveCells = 0;
+        for(var idx= 0; idx < neightbours.length; idx++) {
+            if (neightbours[idx] == TEMPLATE_ALIVE){
+                aliveCells++;
+            }
+        }
+
+        //Next state according to how many neighbour cell are alive
+        switch (aliveCells){
+            case 3:
+                nextState = TEMPLATE_ALIVE;
+                document.getElementById("cell-"+x+"-"+y).className = CLASSNAME_ALIVE;
+                break;
+            case 2 :
+                nextState = grid[x][y];
+                break;
+            default :
+                nextState = TEMPLATE_DEAD;
+                document.getElementById("cell-"+x+"-"+y).className = CLASSNAME_DEAD;
+        }
+
+
+        return nextState;
+    }
+
+
+    /**
+     * Init the grid
+     * @param int size
+     */
+    function initGrid(sizeParam){
+
+        stop();
+
+        size = sizeParam;
+
+        var htmlGrid = "<table class='grid'>";
+        grid = [];
+
+        for(x=0; x<size; x++){
+            htmlGrid+="<tr class='row'>";
+            for(y=0; y<size; y++){
+                if (grid[x] == null){
+                    grid[x] = []
+                }
+                grid[x][y] = TEMPLATE_DEAD;
+                htmlGrid += htmlCell(x,y);
+            }
+            htmlGrid+="</tr>";
+        }
+
+        document.getElementById("grid").innerHTML = htmlGrid;
+        document.getElementById('panel_grid').style.display = 'none';
+        document.getElementById('panel_grid').style.display = 'block';
+
+        document.getElementById('title_grid').className = "subtitle";
+        document.getElementById('title_grid').innerHTML = "";
+    }
+
+
+    /**
+     * Run the generation
+     */
+    function run(){
+        interval = setInterval(function(){
+            generateNextGrid();
+        }, 100);
+
+    }
+
+    /**
+     * Generate the html of a cell
+     * @param Boolean alive
+     * @param int x
+     * @param int y
+     * @return string
+     */
+    function htmlCell(x,y){
+        var className = CLASSNAME_DEAD;
+
+        if (grid[x][y]==TEMPLATE_ALIVE){
+            className = CLASSNAME_ALIVE;
+        }
+
+        return "<td id='cell-"+x+"-"+y+"' class='"+className+"' onClick='clickCell("+x+","+y+")'></td>";
+    }
+
+
+    /**
+     * Function when click on a cell
+     * @param int x
+     * @param int y
+     */
+    function clickCell(x,y){
+
+        var className = "";
+        if (grid[x][y] == TEMPLATE_DEAD){
+            grid[x][y] = TEMPLATE_ALIVE;
+            className = CLASSNAME_ALIVE;
+        }else{
+            grid[x][y] = TEMPLATE_DEAD;
+            className = CLASSNAME_DEAD;
+        }
+
+        document.getElementById("cell-"+x+"-"+y).className = className;
+    }
+
+
+    /**
+     * Stop the Interval
+     */
+    function stop(){
+        if (interval != null){
+            clearInterval(interval);
+        }
+        indexGeneration = 0;
+    }
+
+    /**
+     * Main function
+     */
+    function main(){
+        initGrid(40);
+    }
+
+
+
+</script>
+
+<style>
+
+    *{
+        margin:0px;
+        padding:0px;
+        font-family:"Tahoma";
+        font-size:12px;
+    }
+
+    .cell-alive{
+        border:1px solid #A0A0A0;
+        background-color:navy;
+        height:20px;
+        width:20px;
+        padding:0px;
+        margin:0px;
+        cursor:pointer;
+    }
+
+    .cell-dead{
+        border:1px solid #A0A0A0;
+        background-color:white;
+        height:20px;
+        width:20px;
+        cursor:pointer;
+    }
+
+    .grid{
+        margin:20px;
+        border:2px solid #808080;
+        border-collapse:collapse;
+        table-layout: fixed;
+    }
+
+    .row{
+        border:1px solid #A0A0A0;
+    }
+
+    .top_bar{
+        width:500px;
+        margin-left:20px;
+        margin-top:20px;
+    }
+
+    .header{
+        font-size:25px;
+        height:40px;
+        background-color:black;
+        padding:10px;
+        padding-left:20px;
+        color:white;
+
+    }
+
+    .subtitle {
+        font-size:20px;
+        padding-bottom:10px;
+    }
+
+    .subtitle_red{
+        font-size:20px;
+        padding-bottom:10px;
+        color:red;
+    }
+
+    .left{
+        float:left;
+    }
+
+
+</style>
+
+<body>
+
+<div class="header">
+    Game of Life
+</div>
+
+<div class="left">
+    <div class="top_bar">
+        <div class="subtitle">Controls</div>
+        Grid size : <input id="input-size" type="text" name="size" value="40">
+        <input type="button" value="↻" onClick="initGrid(document.getElementById('input-size').value)">
+        <input type="button" value="▶" onClick="run()">
+        <input type="button" value="◼" onClick="stop()">
+    </div>
+
+    <div class="top_bar">
+        <div id="title_grid" class="subtitle"></div>
+    </div>
+
+</div>
+
+<div class="right">
+
+    <div id="panel_grid">
+        <div id="grid"/>
+    </div>
+</div>
+
+</div>
+
+
+</body>
+</html>
+
+<script>
+
+    main();
+</script>
