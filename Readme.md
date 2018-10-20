@@ -1,6 +1,6 @@
 # Game of Life
 
-PHP Projet to illustrate the John Conway's Game of Life.
+HTML and JS Projet to illustrate the John Conway's Game of Life.
 
 You can find more about this project here :  https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 
@@ -22,6 +22,3 @@ Open the file GameOfLife.html in your favourie web browser.
 
 The size of the grid can be chosen.
 You can click on a cell to change its state.
-
-
-
