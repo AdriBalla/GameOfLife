@@ -4,12 +4,12 @@
 <script>
 
     //Cells value
-    const TEMPLATE_ALIVE='1';
-    const TEMPLATE_DEAD='0';
+    const TEMPLATE_ALIVE=true;
+    const TEMPLATE_DEAD=false;
 
     //Style className of Cells
-    const CLASSNAME_ALIVE = "cell-alive";
-    const CLASSNAME_DEAD = "cell-dead";
+    const CLASSNAME_ALIVE = "alive";
+    const CLASSNAME_DEAD = "dead";
 
     var templates = {TEMPLATE_ALIVE:CLASSNAME_ALIVE,TEMPLATE_DEAD:CLASSNAME_DEAD};
 
@@ -19,8 +19,11 @@
     //Current Grid
     var grid = [];
 
-    //Size of the grid
-    var gridSize;
+    //Width of the grid
+    var gridWidth;
+
+    //Height of the grid
+    var gridHeight;
 
     //Index of the current generation
     var indexGeneration = 0;
@@ -43,7 +46,7 @@
 
         indexGeneration++;
 
-        document.getElementById('title_grid').className = "subtitle_red";
+        document.getElementById('title_grid').className = "red";
         document.getElementById('title_grid').innerHTML = indexGeneration;
 
         grid = nextGrid;
@@ -58,55 +61,19 @@
      */
     function nextStateForCell(x,y){
 
-        maxSize = size-1;
+        var aliveNeightbours = 0;
+        var nextState=null;
 
-        neightbours = [];
-
-        //Left side of the cell
-        if (y != 0){
-            neightbours.push(grid[x][y-1]);
-
-            if (x != 0){
-                neightbours.push(grid[x-1][y-1]);
-            }
-
-            if (x != maxSize){
-                neightbours.push(grid[x+1][y-1]);
-            }
-        }
-
-        //Middle
-        if (x != 0){
-            neightbours.push(grid[x-1][y]);
-        }
-
-        if (x < maxSize){
-            neightbours.push(grid[x+1][y]);
-        }
-
-        //Right side of the cell
-        if (y < maxSize){
-            neightbours.push(grid[x][y+1]);
-
-            if (x != 0){
-                neightbours.push(grid[x-1][y+1]);
-            }
-
-            if (x != maxSize){
-                neightbours.push(grid[x+1][y+1]);
-            }
-        }
-
-        //Test how many alive
-        var aliveCells = 0;
-        for(var idx= 0; idx < neightbours.length; idx++) {
-            if (neightbours[idx] == TEMPLATE_ALIVE){
-                aliveCells++;
+        for (var i = x-1 ; i <= x +1 ; i++){
+            for (var j = y-1 ; j <= y +1 ; j++){
+                if ((x !=i || y != j) && grid[i] && grid[i][j] && grid[i][j] == TEMPLATE_ALIVE) {
+                    aliveNeightbours++;
+                }
             }
         }
 
         //Next state according to how many neighbour cell are alive
-        switch (aliveCells){
+        switch (aliveNeightbours){
             case 3:
                 nextState = TEMPLATE_ALIVE;
                 document.getElementById("cell-"+x+"-"+y).className = CLASSNAME_ALIVE;
@@ -128,18 +95,19 @@
      * Init the grid
      * @param int size
      */
-    function initGrid(sizeParam){
+    function initGrid(widthParam,heightParam){
 
         stop();
 
-        size = sizeParam;
+        width = widthParam;
+        height = heightParam;
 
         var htmlGrid = "<table class='grid'>";
         grid = [];
 
-        for(x=0; x<size; x++){
+        for(y=0; y<height; y++){
             htmlGrid+="<tr class='row'>";
-            for(y=0; y<size; y++){
+            for(x=0; x<width; x++){
                 if (grid[x] == null){
                     grid[x] = []
                 }
@@ -192,7 +160,6 @@
      * @param int y
      */
     function clickCell(x,y){
-
         var className = "";
         if (grid[x][y] == TEMPLATE_DEAD){
             grid[x][y] = TEMPLATE_ALIVE;
@@ -220,7 +187,7 @@
      * Main function
      */
     function main(){
-        initGrid(40);
+        initGrid(80,50);
     }
 
 
@@ -230,43 +197,13 @@
 <style>
 
     *{
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         margin:0px;
         padding:0px;
-        font-family:"Tahoma";
         font-size:12px;
     }
 
-    .cell-alive{
-        border:1px solid #A0A0A0;
-        background-color:navy;
-        height:20px;
-        width:20px;
-        padding:0px;
-        margin:0px;
-        cursor:pointer;
-    }
-
-    .cell-dead{
-        border:1px solid #A0A0A0;
-        background-color:white;
-        height:20px;
-        width:20px;
-        cursor:pointer;
-    }
-
-    .grid{
-        margin:20px;
-        border:2px solid #808080;
-        border-collapse:collapse;
-        table-layout: fixed;
-    }
-
-    .row{
-        border:1px solid #A0A0A0;
-    }
-
     .top_bar{
-        width:500px;
         margin-left:20px;
         margin-top:20px;
     }
@@ -278,7 +215,36 @@
         padding:10px;
         padding-left:20px;
         color:white;
+        margin-bottom:50px;
 
+    }
+
+    .alive{
+        background-color:mediumblue;
+    }
+
+    td{
+        height:10px;
+        width:10px;
+        border:1px solid #A0A0A0;
+        cursor:pointer;
+    }
+
+    table{
+        border-collapse:collapse;
+        table-layout: fixed;
+        border: 2px solid #808080;
+        box-shadow: inset 0 1px 3px #ddd;
+    }
+
+    tr{
+        border:1px solid #A0A0A0;
+    }
+
+    .left{
+        float:left;
+        margin-right:20px;
+        margin-left:20px;
     }
 
     .subtitle {
@@ -286,15 +252,35 @@
         padding-bottom:10px;
     }
 
-    .subtitle_red{
+    .red{
         font-size:20px;
-        padding-bottom:10px;
-        color:red;
+        color:crimson;
+        margin-top:20px;
     }
 
-    .left{
-        float:left;
+    .red.invisible{
+        display:none;
     }
+
+    .label{
+        width:200px;
+        display:block;
+        margin-bottom:10px;
+    }
+
+    input {
+        border: 1px solid #ccc;
+        box-shadow: inset 0 1px 3px #ddd;
+        border-radius: 4px;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        margin-right:px;
+
+    }
+
+
 
 
 </style>
@@ -308,14 +294,15 @@
 <div class="left">
     <div class="top_bar">
         <div class="subtitle">Controls</div>
-        Grid size : <input id="input-size" type="text" name="size" value="40">
-        <input type="button" value="↻" onClick="initGrid(document.getElementById('input-size').value)">
+        <div class="label">Grid width : <input id="width" value="80"/><br/></div>
+        <div class="label">Grid height :<input id="height" value="50"/><br/></div>
+        <input type="button" value="↻" onClick="initGrid(document.getElementById('width').value,document.getElementById('height').value)">
         <input type="button" value="▶" onClick="run()">
         <input type="button" value="◼" onClick="stop()">
     </div>
 
     <div class="top_bar">
-        <div id="title_grid" class="subtitle"></div>
+        <div id="title_grid" class="red"></div>
     </div>
 
 </div>
