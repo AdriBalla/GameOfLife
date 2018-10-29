@@ -19,12 +19,6 @@
     //Current Grid
     var grid = [];
 
-    //Width of the grid
-    var gridWidth;
-
-    //Height of the grid
-    var gridHeight;
-
     //Index of the current generation
     var indexGeneration = 0;
 
@@ -211,7 +205,7 @@
     .header{
         font-size:25px;
         height:40px;
-        background-color:black;
+        background-color:#24292e;
         padding:10px;
         padding-left:20px;
         color:white;
@@ -276,8 +270,13 @@
         padding-right: 20px;
         padding-top: 12px;
         padding-bottom: 12px;
-        margin-right:px;
+        margin-right:2px;
 
+    }
+
+    .button{
+        background-color:lightgray;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
 
@@ -296,9 +295,9 @@
         <div class="subtitle">Controls</div>
         <div class="label">Grid width : <input id="width" value="80"/><br/></div>
         <div class="label">Grid height :<input id="height" value="50"/><br/></div>
-        <input type="button" value="↻" onClick="initGrid(document.getElementById('width').value,document.getElementById('height').value)">
-        <input type="button" value="▶" onClick="run()">
-        <input type="button" value="◼" onClick="stop()">
+        <input type="button" class="button" value="↻" onClick="initGrid(document.getElementById('width').value,document.getElementById('height').value)">
+        <input type="button" class="button" value="▶" onClick="run()">
+        <input type="button" class="button" value="◼" onClick="stop()">
     </div>
 
     <div class="top_bar">
